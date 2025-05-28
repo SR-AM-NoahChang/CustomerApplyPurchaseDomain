@@ -27,7 +27,7 @@ pipeline {
         dir('/work/collections') {
           sh '''
             if [ ! -d .git ]; then
-              git clone https://github.com/SR-AM-NoahChang/Maid-postman-auto-tests.git .
+              git clone https://github.com/SR-AM-NoahChang/CustomerApplyPurchaseDomain.git .
             fi
             git fetch origin main
             git reset --hard origin/main
