@@ -143,8 +143,8 @@ pipeline {
               def pendingJobs = json.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
     
               if (failedJobs || blockedJobs) {
-                def failedDetails = failedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} ❌failure" }
-                def blockedDetails = blockedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} 🔒blocked" }
+                def failedDetails = failedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌failure" }
+                def blockedDetails = blockedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒blocked" }
                 def allIssues = (failedDetails + blockedDetails).join("\\n")
     
                 echo "🚨 偵測到異常 Job：\n${allIssues.replace('\\n', '\n')}"
@@ -327,8 +327,8 @@ pipeline {
               def pendingJobs = json.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
     
               if (failedJobs || blockedJobs) {
-                def failedDetails = failedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} ❌failure" }
-                def blockedDetails = blockedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} 🔒blocked" }
+                def failedDetails = failedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌failure" }
+                def blockedDetails = blockedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒blocked" }
                 def allIssues = (failedDetails + blockedDetails).join("\\n")
     
                 echo "🚨 偵測到異常 Job：\n${allIssues.replace('\\n', '\n')}"
