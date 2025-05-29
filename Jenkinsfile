@@ -183,16 +183,16 @@ pipeline {
                               }
                             },
                             {
-                              "textParagraph": {
-                                "text": "────────────────────────────"
+                              "keyValue": {
+                                "topLabel": "────────────────────────────"
                               }
                             },
                             {
-                              "keyValue": {
-                                "topLabel": "自動化Job",
-                                "content": "${allIssues.replace('"', '\\"')}"
+                              "textParagraph": {
+                                "text": "<b>自動化Job</b><br>${allIssues.replace('"', '\\"').replaceAll('\\n', '<br>')}"
                               }
                             }
+
                           ]
                         }
                       ]
