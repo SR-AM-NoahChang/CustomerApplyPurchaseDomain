@@ -63,6 +63,48 @@ pipeline {
     stage('取得廳主買域名項目資料 (Job狀態檢查)') {
       steps {
         script {
+          def jobNameMap = [
+            "AddTag": "AddTag（新增 Tag）",
+            "AddThirdLevelRandom": "AddThirdLevelRandom（設定三級亂數）",
+            "AttachAntiBlockTarget": "AttachAntiBlockTarget（新增抗封鎖目標）",
+            "AttachAntiHijackSource": "AttachAntiHijackSource（新增抗劫持）",
+            "AttachAntiHijackTarget": "AttachAntiHijackTarget（新增抗劫持目標）",
+            "CheckDomainBlocked": "CheckDomainBlocked（檢查封鎖）",
+            "CheckPurchaseDeployCertificateStatus": "CheckPurchaseDeployCertificateStatus（檢查購買部署憑證結果）",
+            "CheckWorkflowApplication": "CheckWorkflowApplication（檢查自動化申請）",
+            "DeleteDomainRecord": "DeleteDomainRecord（刪除解析）",
+            "DetachAntiBlockSource": "DetachAntiBlockSource（撤下抗封鎖）",
+            "DetachAntiBlockTarget": "DetachAntiBlockTarget（撤下抗封鎖目標）",
+            "DetachAntiHijackSource": "DetachAntiHijackSource（撤下抗劫持）",
+            "DetachAntiHijackTarget": "DetachAntiHijackTarget（撤下抗劫持目標）",
+            "InformDomainInfringement": "InformDomainInfringement（通知侵權網址）",
+            "MergeErrorRecord": "MergeErrorRecord（檢查異常地區合併規則）",
+            "PurchaseAndDeployCert": "PurchaseAndDeployCert（購買與部署憑證）",
+            "PurchaseDomain": "PurchaseDomain（購買域名）",
+            "RecheckARecordResolution": "RecheckARecordResolution（複檢域名 A 紀錄解析）",
+            "RecheckCert": "RecheckCert（複檢憑證）",
+            "RecheckDomainResolution": "RecheckDomainResolution（複檢域名）",
+            "RecheckThirdLevelRandom": "RecheckThirdLevelRandom（複檢三級亂數）",
+            "RemoveAntiBlock": "RemoveAntiBlock（刪除抗封鎖）",
+            "RemoveAntiBlockTarget": "RemoveAntiBlockTarget（刪除抗封鎖目標）",
+            "RemoveAntiHijackSource": "RemoveAntiHijackSource（刪除抗劫持）",
+            "RemoveAntiHijackTarget": "RemoveAntiHijackTarget（刪除抗劫持目標）",
+            "RemoveTag": "RemoveTag（移除 Tag）",
+            "ReplaceCertificateProviderDetach": "ReplaceCertificateProviderDetach（替換憑證商下架）",
+            "ReuseAndDeployCert": "ReuseAndDeployCert（轉移憑證）",
+            "RevokeCert": "RevokeCert（撤銷憑證）",
+            "SendCertCompleted": "SendCertCompleted（通知憑證已完成）",
+            "SendUpdateUB": "SendUpdateUB（通知 UB 更新）",
+            "SyncT2": "SyncT2（同步 F5 T2 設定）",
+            "UpdateDomainRecord": "UpdateDomainRecord（設定域名解析）",
+            "UpdateNameServer": "UpdateNameServer（上層設定）",
+            "UpdateOneToOneList": "UpdateOneToOneList（更新一對一IP清單）",
+            "UpdateOneToOneSourceRecord": "UpdateOneToOneSourceRecord（來源域名解析設定）",
+            "UpdateOneToOneTargetRecord": "UpdateOneToOneTargetRecord（目標域名解析設定）",
+            "VerifyDomainPDNSTags": "VerifyDomainPDNSTags（驗證域名 PDNS Tag）",
+            "VerifyTLD": "VerifyTLD（驗證頂級域名）"
+          ]
+          
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             def exported = readJSON file: '/tmp/exported_env.json'
             def workflowId = exported.values.find { it.key == 'PD_WORKFLOW_ID' }?.value
@@ -101,8 +143,8 @@ pipeline {
               def pendingJobs = json.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
     
               if (failedJobs || blockedJobs) {
-                def failedDetails = failedJobs.collect { "- ${it.name} (failure)" }
-                def blockedDetails = blockedJobs.collect { "- ${it.name} (blocked)" }
+                def failedDetails = failedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} (失敗 failure)" }
+                def blockedDetails = blockedJobs.collect { "- ${jobNameMap.get(it.name, it.name)} (阻塞 blocked)" }
                 def allIssues = (failedDetails + blockedDetails).join("\\n")
     
                 echo "🚨 偵測到異常 Job：\n${allIssues.replace('\\n', '\n')}"
@@ -226,52 +268,62 @@ pipeline {
   }
 
   post {
-  always {
-    script {
-      def buildResult = currentBuild.currentResult
-      def statusEmoji = buildResult == 'SUCCESS' ? '✅' : (buildResult == 'FAILURE' ? '❌' : '⚠️')
-      def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
+    always {
+      script {
+        def buildResult = currentBuild.currentResult
+        def statusEmoji = buildResult == 'SUCCESS' ? '✅' :
+                          buildResult == 'FAILURE' ? '❌' :
+                          buildResult == 'UNSTABLE' ? '⚠️' :
+                          buildResult == 'ABORTED' ? '🚫' : '❔'
 
-      def message = """
-      {
-        \"cards\": [
-          {
-            \"header\": {
-              \"title\": \"${statusEmoji} Jenkins Pipeline 執行結果\",
-              \"subtitle\": \"專案：${env.JOB_NAME} (#${env.BUILD_NUMBER})\",
-              \"imageUrl\": \"https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/jenkins-icon.png\",
-              \"imageStyle\": \"AVATAR\"
-            },
-            \"sections\": [
-              {
-                \"widgets\": [
-                  {
-                    \"keyValue\": {
-                      \"topLabel\": \"狀態\",
-                      \"content\": \"${buildResult}\"
+        // 對應中文狀態
+        def statusText = buildResult == 'SUCCESS' ? '成功(SUCCESS)' :
+                        buildResult == 'FAILURE' ? '失敗(FAILURE)' :
+                        buildResult == 'UNSTABLE' ? '不穩定(UNSTABLE)' :
+                        buildResult == 'ABORTED' ? '已終止(ABORTED)' : '未知'
+
+        def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
+
+        def message = """
+        {
+          \"cards\": [
+            {
+              \"header\": {
+                \"title\": \"${statusEmoji} Jenkins Pipeline 執行結果\",
+                \"subtitle\": \"專案：${env.JOB_NAME} (#${env.BUILD_NUMBER})\",
+                \"imageUrl\": \"https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/jenkins-icon.png\",
+                \"imageStyle\": \"AVATAR\"
+              },
+              \"sections\": [
+                {
+                  \"widgets\": [
+                    {
+                      \"keyValue\": {
+                        \"topLabel\": \"狀態\",
+                        \"content\": \"${statusText}\"
+                      }
+                    },
+                    {
+                      \"keyValue\": {
+                        \"topLabel\": \"完成時間\",
+                        \"content\": \"${timestamp}\"
+                      }
                     }
-                  },
-                  {
-                    \"keyValue\": {
-                      \"topLabel\": \"完成時間\",
-                      \"content\": \"${timestamp}\"
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-      """
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        """
 
-      writeFile file: 'payload.json', text: message
+        writeFile file: 'payload.json', text: message
 
-      withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
-        sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
+        withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
+          sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
+        }
       }
     }
   }
-}
 
 }
