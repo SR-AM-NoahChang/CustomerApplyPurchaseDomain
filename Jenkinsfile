@@ -158,37 +158,52 @@ pipeline {
     
                 echo "🚨 偵測到異常 Job：\n${allIssues.replace('\\n', '\n')}"
     
-               writeFile file: 'payload.json', text: """{
-                  "cards": [{
-                    "header": {
-                      "title": "🚨 取得廳主買域名項目資料 (Job狀態檢查 - 異常)",
-                      "subtitle": "Workflow: ${workflowId}",
-                      "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
-                    },
-                    "sections": [{
-                      "widgets": [
+               def message = """{
+                  "cards": [
+                    {
+                      "header": {
+                        "title": "🚨 Jenkins - 取得廳主買域名項目資料 (Job狀態檢查 - 異常)",
+                        "subtitle": "Workflow ID: ${workflowId}",
+                        "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png",
+                        "imageStyle": "AVATAR"
+                      },
+                      "sections": [
                         {
-                          "textParagraph": {
-                            "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
-                          }
-                        },
-                        {
-                          "textParagraph": {
-                            "text": "────────────────────────────"
-                          }
-                        },
-                        {
-                          "textParagraph": {
-                            "text": "${allIssues.replace('"', '\\"')}"
-                          }
+                          "widgets": [
+                            {
+                              "keyValue": {
+                                "topLabel": "🌐 測試環境",
+                                "content": "${envName}"
+                              }
+                            },
+                            {
+                              "keyValue": {
+                                "topLabel": "🔗 BASE_URL",
+                                "content": "${BASE_URL}"
+                              }
+                            },
+                            {
+                              "textParagraph": {
+                                "text": "────────────────────────────"
+                              }
+                            },
+                            {
+                              "keyValue": {
+                                "topLabel": "自動化Job",
+                                "content": "${allIssues.replace('"', '\\"')}"
+                              }
+                            }
+                          ]
                         }
                       ]
-                    }]
-                  }]
+                    }
+                  ]
                 }"""
-    
-                withEnv(["WEBHOOK_URL=${WEBHOOK_URL}"]) {
-                  sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK_URL"'
+
+                writeFile file: 'payload.json', text: message
+
+                withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
+                  sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
                 }
     
                 error("❌ 偵測到異常 Job（已通知 webhook）")
