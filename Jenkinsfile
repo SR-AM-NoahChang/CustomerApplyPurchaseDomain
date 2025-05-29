@@ -214,7 +214,7 @@ pipeline {
                     "widgets": [
                       {
                         "textParagraph": {
-                          "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                          "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
                         }
                       },
                       {
@@ -419,7 +419,7 @@ pipeline {
                     "widgets": [
                       {
                         "textParagraph": {
-                          "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                          "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
                         }
                       },
                       {
