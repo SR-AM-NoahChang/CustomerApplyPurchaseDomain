@@ -162,7 +162,7 @@ pipeline {
                   "cards": [
                     {
                       "header": {
-                        "title": "🚨 Jenkins - 取得廳主買域名項目資料 (Job狀態檢查 - 異常)",
+                        "title": "🚨 Jenkins - 廳主買域名項目資料 (Job狀態檢查 - 異常)",
                         "subtitle": "Workflow ID: ${workflowId}",
                         "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png",
                         "imageStyle": "AVATAR"
@@ -226,7 +226,7 @@ pipeline {
               writeFile file: 'payload.json', text: """{
                 "cards": [{
                   "header": {
-                    "title": "⏰ 取得廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
+                    "title": "⏰ 廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
                     "subtitle": "Workflow Timeout",
                     "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                   },
@@ -391,7 +391,7 @@ pipeline {
                writeFile file: 'payload.json', text: """{
                   "cards": [{
                     "header": {
-                      "title": "🚨 取得刪除域名項目資料 (Job狀態檢查 - 異常)",
+                      "title": "🚨 刪除域名項目資料 (Job狀態檢查 - 異常)",
                       "subtitle": "Workflow: ${workflowId}",
                       "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                     },
@@ -452,7 +452,7 @@ pipeline {
                writeFile file: 'payload.json', text: """{
                 "cards": [{
                   "header": {
-                    "title": "⏰ 取得廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
+                    "title": "⏰ 除域名項目資料 (Job狀態檢查) 輪詢超時失敗",
                     "subtitle": "Workflow Timeout",
                     "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                   },
