@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "399ffbc4-9a0e-48f5-a397-e05e24f37958",
-		"name": "清除測試域名",
+		"name": "15清除測試域名",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42767672"
 	},
@@ -19,8 +19,18 @@
 							"",
 							"var responseJson = pm.response.json(); ",
 							"var workflowId = responseJson.workflow_id;  ",
-							"pm.collectionVariables.set(\"DD_WORKFLOW_ID\", workflowId);",
-							""
+							"//pm.collectionVariables.set(\"DD_WORKFLOW_ID\", workflowId);",
+							"pm.environment.set(\"DD_WORKFLOW_ID\", workflowId);",
+							"if (workflowId) {",
+							"    // 新增這段，讓 workflow_id 出現在報告的 assertion 中",
+							"    pm.test(\"dd_workflow_id: \" + workflowId, function () {",
+							"        pm.expect(true).to.be.true;",
+							"    });",
+							"} else {",
+							"    pm.test(\"❌ dd_workflow_id 不存在\", function () {",
+							"        pm.expect.fail(\"回應中無 dd_workflow_id\");",
+							"    });",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
