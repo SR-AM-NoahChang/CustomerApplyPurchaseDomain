@@ -169,7 +169,7 @@ pipeline {
                       "widgets": [
                         {
                           "textParagraph": {
-                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                            "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
                           }
                         },
                         {
@@ -206,25 +206,26 @@ pipeline {
               writeFile file: 'payload.json', text: """{
                 "cards": [{
                   "header": {
-                    "title": "⏰ Jenkins 輪詢超時失敗",
+                    "title": "⏰ 取得廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
                     "subtitle": "Workflow Timeout",
                     "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                   },
                   "sections": [{
-                      "widgets": [
-                        {
-                          "textParagraph": {
-                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
-                          }
-                        },
-                        {
-                          "textParagraph": {
-                            "text": "${allIssues.replace('"', '\\"')}"
-                          }
+                    "widgets": [
+                      {
+                        "textParagraph": {
+                          "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
                         }
-                      ]
-                    }]
+                      },
+                      {
+                        "keyValue": {
+                          "topLabel": "Workflow ID",
+                          "content": "${workflowId}"
+                        }
+                      }
+                    ]
                   }]
+                }]
               }"""
     
               withEnv(["WEBHOOK_URL=${WEBHOOK_URL}"]) {
@@ -373,7 +374,7 @@ pipeline {
                       "widgets": [
                         {
                           "textParagraph": {
-                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                            "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
                           }
                         },
                         {
@@ -407,20 +408,27 @@ pipeline {
             if (!success) {
               echo "⏰ 超過最大重試次數（${maxRetries} 次），workflow 未完成"
     
-              writeFile file: 'payload.json', text: """{
+               writeFile file: 'payload.json', text: """{
                 "cards": [{
                   "header": {
-                    "title": "⏰ Jenkins 輪詢超時失敗",
+                    "title": "⏰ 取得廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
                     "subtitle": "Workflow Timeout",
                     "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                   },
                   "sections": [{
-                    "widgets": [{
-                      "keyValue": {
-                        "topLabel": "Workflow ID",
-                        "content": "${workflowId}"
+                    "widgets": [
+                      {
+                        "textParagraph": {
+                          "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                        }
+                      },
+                      {
+                        "keyValue": {
+                          "topLabel": "Workflow ID",
+                          "content": "${workflowId}"
+                        }
                       }
-                    }]
+                    ]
                   }]
                 }]
               }"""
