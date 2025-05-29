@@ -104,6 +104,15 @@ pipeline {
             "VerifyDomainPDNSTags": "VerifyDomainPDNSTags（驗證域名 PDNS Tag）",
             "VerifyTLD": "VerifyTLD（驗證頂級域名）"
           ]
+
+          def envName = "測試環境"
+            if (BASE_URL.contains("vir999.com")) {
+              envName = "DEV"
+            } else if (BASE_URL.contains("staging168.com")) {
+              envName = "STAGING"
+            } else if (BASE_URL.contains("vir000.com")) {
+              envName = "PROD"
+          }
           
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             def exported = readJSON file: '/tmp/exported_env.json'
@@ -197,14 +206,20 @@ pipeline {
                     "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                   },
                   "sections": [{
-                    "widgets": [{
-                      "keyValue": {
-                        "topLabel": "Workflow ID",
-                        "content": "${workflowId}"
-                      }
+                      "widgets": [
+                        {
+                          "textParagraph": {
+                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                          }
+                        },
+                        {
+                          "textParagraph": {
+                            "text": "${allIssues.replace('"', '\\"')}"
+                          }
+                        }
+                      ]
                     }]
                   }]
-                }]
               }"""
     
               withEnv(["WEBHOOK_URL=${WEBHOOK_URL}"]) {
@@ -288,6 +303,15 @@ pipeline {
             "VerifyDomainPDNSTags": "VerifyDomainPDNSTags（驗證域名 PDNS Tag）",
             "VerifyTLD": "VerifyTLD（驗證頂級域名）"
           ]
+         
+          def envName = "測試環境"
+            if (BASE_URL.contains("vir999.com")) {
+              envName = "DEV"
+            } else if (BASE_URL.contains("staging168.com")) {
+              envName = "STAGING"
+            } else if (BASE_URL.contains("vir000.com")) {
+              envName = "PROD"
+          }
 
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             def exported = readJSON file: '/tmp/exported_env.json'
@@ -342,6 +366,11 @@ pipeline {
                     },
                     "sections": [{
                       "widgets": [
+                        {
+                          "textParagraph": {
+                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                          }
+                        },
                         {
                           "textParagraph": {
                             "text": "${allIssues.replace('"', '\\"')}"
