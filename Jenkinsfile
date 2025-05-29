@@ -169,6 +169,11 @@ pipeline {
                       "widgets": [
                         {
                           "textParagraph": {
+                            "text": "🌐 Environment: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                          }
+                        },
+                        {
+                          "textParagraph": {
                             "text": "${allIssues.replace('"', '\\"')}"
                           }
                         }
