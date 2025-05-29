@@ -221,6 +221,31 @@ pipeline {
     stage('清除測試域名') {
       steps {
         script {
+          def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
+          if (fileExists(collectionPath)) {
+            echo "🧹 開始執行測試資料清除 collection：清除測試域名"
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              sh """
+                newman run "${collectionPath}" \
+                  --environment "${ENV_FILE}" \
+                  --insecure \
+                  --reporters cli,json,html,junit,allure \
+                  --reporter-json-export "${REPORT_DIR}/DeleteDomain_cleanup_report.json" \
+                  --reporter-html-export "${HTML_REPORT_DIR}/DeleteDomain_cleanup_report.html" \
+                  --reporter-junit-export "${REPORT_DIR}/DeleteDomain_cleanup_report.xml" \
+                  --reporter-allure-export "allure-results"
+              """
+            }
+          } else {
+            echo "⚠️ 找不到 collection 檔案：${collectionPath}，跳過清除流程"
+          }
+        }
+      }
+    }
+
+    stage('取得刪除域名項目資料 (Job狀態檢查)') {
+      steps {
+        script {
           def jobNameMap = [
             "AddTag": "AddTag（新增 Tag）",
             "AddThirdLevelRandom": "AddThirdLevelRandom（設定三級亂數）",
@@ -263,31 +288,6 @@ pipeline {
             "VerifyTLD": "VerifyTLD（驗證頂級域名）"
           ]
 
-          def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
-          if (fileExists(collectionPath)) {
-            echo "🧹 開始執行測試資料清除 collection：清除測試域名"
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-              sh """
-                newman run "${collectionPath}" \
-                  --environment "${ENV_FILE}" \
-                  --insecure \
-                  --reporters cli,json,html,junit,allure \
-                  --reporter-json-export "${REPORT_DIR}/DeleteDomain_cleanup_report.json" \
-                  --reporter-html-export "${HTML_REPORT_DIR}/DeleteDomain_cleanup_report.html" \
-                  --reporter-junit-export "${REPORT_DIR}/DeleteDomain_cleanup_report.xml" \
-                  --reporter-allure-export "allure-results"
-              """
-            }
-          } else {
-            echo "⚠️ 找不到 collection 檔案：${collectionPath}，跳過清除流程"
-          }
-        }
-      }
-    }
-
-    stage('取得刪除域名項目資料 (Job狀態檢查)') {
-      steps {
-        script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             def exported = readJSON file: '/tmp/exported_env.json'
             def workflowId = exported.values.find { it.key == 'DD_WORKFLOW_ID' }?.value
