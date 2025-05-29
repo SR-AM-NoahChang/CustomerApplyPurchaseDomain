@@ -189,7 +189,7 @@ pipeline {
                             },
                             {
                               "textParagraph": {
-                                "text": "<b>自動化Job</b><br>${allIssues.replace('"', '\\"').replaceAll('\\n', '<br>')}"
+                                "text": "<b>自動化Job:</b><br>${allIssues.replace('"', '\\"').replaceAll('\\n', '<br>')}"
                               }
                             }
 
@@ -395,22 +395,33 @@ pipeline {
                       "subtitle": "Workflow: ${workflowId}",
                       "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                     },
-                    "sections": [{
-                      "widgets": [
+                    "sections": [
                         {
-                          "textParagraph": {
-                            "text": "🌐 測試環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
-                          }
-                        },
-                        {
-                          "textParagraph": {
-                            "text": "────────────────────────────"
-                          }
-                        },
-                        {
-                          "textParagraph": {
-                            "text": "${allIssues.replace('"', '\\"')}"
-                          }
+                          "widgets": [
+                            {
+                              "keyValue": {
+                                "topLabel": "🌐 測試環境",
+                                "content": "${envName}"
+                              }
+                            },
+                            {
+                              "keyValue": {
+                                "topLabel": "🔗 BASE_URL",
+                                "content": "${BASE_URL}"
+                              }
+                            },
+                            {
+                              "textParagraph": {
+                                "text": "────────────────────────────"
+                              }
+                            },
+                            {
+                              "textParagraph": {
+                                "text": "<b>自動化Job:</b><br>${allIssues.replace('"', '\\"').replaceAll('\\n', '<br>')}"
+                              }
+                            }
+
+                          ]
                         }
                       ]
                     }]
