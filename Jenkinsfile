@@ -218,7 +218,7 @@ pipeline {
       }
     }
 
-    stage('清除測試域名') {
+    stage('刪除域名') {
       steps {
         script {
           def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
@@ -228,6 +228,7 @@ pipeline {
               sh """
                 newman run "${collectionPath}" \
                   --environment "${ENV_FILE}" \
+                  --export-environment "/tmp/exported_env.json" \
                   --insecure \
                   --reporters cli,json,html,junit,allure \
                   --reporter-json-export "${REPORT_DIR}/DeleteDomain_cleanup_report.json" \
