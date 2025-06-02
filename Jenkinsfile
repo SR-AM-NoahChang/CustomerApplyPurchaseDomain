@@ -48,6 +48,7 @@ pipeline {
               newman run "${COLLECTION_DIR}/申請廳主買域名.postman_collection.json" \
                 --environment "${ENV_FILE}" \
                 --export-environment "/tmp/exported_env.json" \
+                --iteration-data "${COLLECTION_DIR}/申請廳主買域名_testdata.json" \
                 --insecure \
                 --reporters cli,json,html,junit,allure \
                 --reporter-json-export "${REPORT_DIR}/CustomerApplyPurchaseDomain_report.json" \
