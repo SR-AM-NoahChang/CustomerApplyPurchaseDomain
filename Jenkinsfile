@@ -41,26 +41,28 @@ pipeline {
         }
       }
 
-    testData.eachWithIndex { data, index ->
-  stage("🧪 執行第 ${index + 1} 筆 testdata：${data['domain'] ?: '執行序'}") {
-    // Step 1: 執行申請廳主買域名
-    stage("申請廳主買域名 - 第 ${index + 1} 筆") {
-      catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-        sh """
-          newman run "${COLLECTION_DIR}/申請廳主買域名.postman_collection.json" \
-            --environment "${ENV_FILE}" \
-            --env-var domain="${data.domain}" \
-            --env-var owner="${data.owner}" \
-            --export-environment "/tmp/exported_env.json" \
-            --insecure \
-            --reporters cli,json,junit \
-            --reporter-json-export "${REPORT_DIR}/CustomerApply_${index + 1}.json" \
-            --reporter-junit-export "${REPORT_DIR}/CustomerApply_${index + 1}.xml"
-        """
+    stage('申請廳主買域名') {
+      steps {
+        script {
+          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            sh '''
+              newman run "${COLLECTION_DIR}/申請廳主買域名.postman_collection.json" \
+                --environment "${ENV_FILE}" \
+                --export-environment "/tmp/exported_env.json" \
+                --iteration-data "${COLLECTION_DIR}/申請廳主買域名_testdata.json" \
+                --insecure \
+                --reporters cli,json,html,junit,allure \
+                --reporter-json-export "${REPORT_DIR}/CustomerApplyPurchaseDomain_report.json" \
+                --reporter-html-export "${HTML_REPORT_DIR}/CustomerApplyPurchaseDomain_report.html" \
+                --reporter-junit-export "${REPORT_DIR}/CustomerApplyPurchaseDomain_report.xml" \
+                --reporter-allure-export "allure-results"
+            '''
+          }
+        }
       }
     }
 
-    stage("檢查 Job 狀態 - 第 ${index + 1} 筆") {
+    stage('取得廳主買域名項目資料 (Job狀態檢查)') {
       steps {
         script {
           def jobNameMap = [
@@ -264,19 +266,25 @@ pipeline {
       }
     }
 
-    stage("刪除域名 - 第 ${index + 1} 筆") {
-      catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-        sh """
-          newman run "${COLLECTION_DIR}/清除測試域名.postman_collection.json" \
-            --environment "${ENV_FILE}" \
-            --env-var domain="${data.domain}" \
-            --export-environment "/tmp/exported_env.json" \
-            --insecure \
-            --reporters cli,json,junit \
-            --reporter-json-export "${REPORT_DIR}/DeleteDomain_${index + 1}.json" \
-            --reporter-junit-export "${REPORT_DIR}/DeleteDomain_${index + 1}.xml"
-        """
-      }
+    stage('刪除域名') {
+      steps {
+        script {
+          def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
+          if (fileExists(collectionPath)) {
+            echo "🧹 開始執行測試資料清除 collection：清除測試域名"
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              sh """
+                newman run "${collectionPath}" \
+                  --environment "${ENV_FILE}" \
+                  --export-environment "/tmp/exported_env.json" \
+                  --insecure \
+                  --reporters cli,json,html,junit,allure \
+                  --reporter-json-export "${REPORT_DIR}/DeleteDomain_cleanup_report.json" \
+                  --reporter-html-export "${HTML_REPORT_DIR}/DeleteDomain_cleanup_report.html" \
+                  --reporter-junit-export "${REPORT_DIR}/DeleteDomain_cleanup_report.xml" \
+                  --reporter-allure-export "allure-results"
+              """
+            }
           } else {
             echo "⚠️ 找不到 collection 檔案：${collectionPath}，跳過清除流程"
           }
@@ -284,7 +292,7 @@ pipeline {
       }
     }
 
-    stage("檢查 Job 狀態（刪除） - 第 ${index + 1} 筆") {
+    stage('取得刪除域名項目資料 (Job狀態檢查)') {
       steps {
         script {
           def jobNameMap = [
