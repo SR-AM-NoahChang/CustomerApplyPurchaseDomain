@@ -480,12 +480,12 @@ pipeline {
               }
               // 讀取 workflow_id 並設定成環境變數
               if (fileExists("/tmp/exported_env.json")) {
-                def workflowId = readExportedEnvVariable("/tmp/exported_env.json", "workflow_id")
-                echo "📤 從 exported_env.json 讀取的 workflow_id: ${workflowId}"
-                if (workflowId) {
-                  env.WORKFLOW_ID = workflowId
+                def PD_WORKFLOW_ID = readExportedEnvVariable("/tmp/exported_env.json", "PD_WORKFLOW_ID")
+                echo "📤 從 exported_env.json 讀取的 PD_WORKFLOW_ID: ${PD_WORKFLOW_ID}"
+                if (PD_WORKFLOW_ID) {
+                  env.PD_WORKFLOW_ID = PD_WORKFLOW_ID
                 } else {
-                  echo "⚠️ exported_env.json 未包含 workflow_id"
+                  echo "⚠️ exported_env.json 未包含 PD_WORKFLOW_ID"
                 }
               } else {
                 echo "❌ 找不到 exported_env.json"
