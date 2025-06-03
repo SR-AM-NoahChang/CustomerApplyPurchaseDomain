@@ -36,7 +36,7 @@
 							"var responseJson = pm.response.json(); ",
 							"var workflowId = responseJson.workflow_id;  ",
 							"//pm.collectionVariables.set(\"PD_WORKFLOW_ID\", workflowId);",
-							"pm.environment.set(\"PD_WORKFLOW_ID\", workflowId);",
+							"pm.collectionVariables.set(\"PD_WORKFLOW_ID\", workflowId);",
 							"",
 							"setTimeout(function() {",
 							"    console.log(\"延遲 1 秒後執行下一個 API...\");",
