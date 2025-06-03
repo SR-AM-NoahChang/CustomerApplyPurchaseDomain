@@ -124,7 +124,7 @@
 							"// 域名欄位檢查",
 							"pm.test(\"域名欄位檢查\", function () {",
 							"    var responseJson = pm.response.json();",
-							"    var expectedDomain = pm.environment.get(\"DOMAIN\");",
+							"    var expectedDomain = pm.iterationData.get(\"domain\");",
 							"",
 							"    pm.expect(responseJson.domain).to.eql(expectedDomain);",
 							"});",
