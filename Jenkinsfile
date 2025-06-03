@@ -443,6 +443,20 @@ pipeline {
         script {
           def testData = readJSON file: "${COLLECTION_DIR}/申請廳主買域名_testdata.json"
 
+          // 定義函式：讀取 exported_env.json 裡指定的 key 值
+          def readExportedEnvVariable = { filePath, key ->
+            def envData = readJSON file: filePath
+            def value = null
+            if (envData?.values) {
+              envData.values.each { item ->
+                if (item.key == key) {
+                  value = item.value
+                }
+              }
+            }
+            return value
+          }
+
           testData.eachWithIndex { dataRow, index ->
             def testLabel = "資料${index + 1}"
             def tmpDataFile = "${WORKSPACE}/data_${index + 1}.json"
@@ -463,13 +477,23 @@ pipeline {
                     --reporter-junit-export "${REPORT_DIR}/Apply_${index + 1}.xml" \
                     --reporter-allure-export "${ALLURE_RESULTS_DIR}"
                 """
-
-                // Debug exported env
-                sh "echo '📤 exported_env.json 內容如下：' && cat /tmp/exported_env.json || echo '❌ 無法讀取 /tmp/exported_env.json'"
+              }
+              // 讀取 workflow_id 並設定成環境變數
+              if (fileExists("/tmp/exported_env.json")) {
+                def workflowId = readExportedEnvVariable("/tmp/exported_env.json", "workflow_id")
+                echo "📤 從 exported_env.json 讀取的 workflow_id: ${workflowId}"
+                if (workflowId) {
+                  env.WORKFLOW_ID = workflowId
+                } else {
+                  echo "⚠️ exported_env.json 未包含 workflow_id"
+                }
+              } else {
+                echo "❌ 找不到 exported_env.json"
               }
             }
 
             stage("${testLabel} - 檢查申請 Job 狀態") {
+              // 使用 env.WORKFLOW_ID 執行輪詢函式（你原本的函式）
               checkCustomerApplyPurchaseDomainJobStatus()
             }
 
@@ -489,9 +513,6 @@ pipeline {
                       --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
                       --reporter-allure-export "${ALLURE_RESULTS_DIR}"
                   """
-
-                  // Debug exported env after delete
-                  sh "echo '📤 exported_env.json (after delete) 內容如下：' && cat /tmp/exported_env.json || echo '❌ 無法讀取 /tmp/exported_env.json'"
                 }
               }
             }
