@@ -140,7 +140,7 @@
 							"// 檢查是否有 domain 欄位",
 							"if (response.domain) {",
 							"    pm.environment.set(\"domain\", response.domain);",
-							"    pm.collectionVariables.set(\"ran_domain\", response.domain);",
+							"    pm.environment.set(\"ran_domain\", response.domain);",
 							"    console.log(\"Domain saved to collection variable:\", response.domain);",
 							"} else {",
 							"    console.warn(\"Domain field not found in response\");",
