@@ -1,4 +1,4 @@
-// 取得廳主買域名項目資料 (Job狀態檢查)
+// 取得廳主買域名項目資料 (輪詢Job狀態檢查)
 def checkCustomerApplyPurchaseDomainJobStatus() {
                 def jobNameMap = [
                     "AddTag": "AddTag 新增 Tag",
@@ -199,7 +199,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                 }
 }
 
-// 取得刪除域名項目資料 (Job狀態檢查)
+// 取得刪除域名項目資料 (輪詢Job狀態檢查)
 def DeleteDomainJobStatus() {
                 def jobNameMap = [
                     "AddTag": "AddTag 新增 Tag",
