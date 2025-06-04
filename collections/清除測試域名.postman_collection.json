@@ -61,7 +61,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"domain\": \"{{domain}}\",\n  \"site_group\": \"dctest\"\n}",
+					"raw": "{\n  \"domain\": \"{{ran_domain}}\",\n  \"site_group\": \"dctest\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
