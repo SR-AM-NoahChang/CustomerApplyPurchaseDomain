@@ -181,6 +181,50 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     if (stillPending.isEmpty()) {
                         echo "✅ 所有 Job 已完成，提前結束輪詢"
                         success = true
+
+                        // ✅ 新增成功時 webhook 通知
+                        if (!patchedJobs.isEmpty()) {
+                            def successPatchedMessage = """{
+                                "cards": [{
+                                    "header": {
+                                        "title": "✅ 廳主買域名項目資料 (Job狀態檢查) 成功",
+                                        "subtitle": "部分 Job 有人工 PATCH 處理",
+                                        "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
+                                    },
+                                    "sections": [{
+                                        "widgets": [
+                                            {
+                                                "textParagraph": {
+                                                    "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}"
+                                                }
+                                            },
+                                            {
+                                                "textParagraph": {
+                                                    "text": "────────────────────────────"
+                                                }
+                                            },
+                                            {
+                                                "textParagraph": {
+                                                    "text": "<b>🔍 初始 Job 狀態：</b><br>${initialJobList.replace('"', '\\"').replaceAll("\\n", "<br>")}"
+                                                }
+                                            },
+                                            {
+                                                "textParagraph": {
+                                                    "text": "<b>🛠 有人工 PATCH Job：</b><br>${patchedJobs.join("<br>").replace('"', '\\"')}"
+                                                }
+                                            }
+                                        ]
+                                    }]
+                                }]
+                            }"""
+
+                            writeFile file: 'payload.json', text: successPatchedMessage
+
+                            withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
+                                sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
+                            }
+                        }
+
                         break
                     }
 
