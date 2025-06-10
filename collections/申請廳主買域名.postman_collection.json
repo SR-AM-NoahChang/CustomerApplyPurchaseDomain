@@ -137,14 +137,18 @@
 							"// 取得 JSON 回應",
 							"let response = pm.response.json();",
 							"",
-							"// 檢查是否有 domain 欄位",
+							"",
 							"if (response.domain) {",
-							"    pm.environment.set(\"domain\", response.domain);",
-							"    pm.environment.set(\"ran_domain\", response.domain);",
-							"    console.log(\"Domain saved to collection variable:\", response.domain);",
+							"    // 新增這段，讓 workflow_id 出現在報告的 assertion 中",
+							"    pm.test(\"ran_domain: \" + response.domain, function () {",
+							"        pm.expect(true).to.be.true;",
+							"    });",
 							"} else {",
-							"    console.warn(\"Domain field not found in response\");",
+							"    pm.test(\"❌ ran_domain 不存在\", function () {",
+							"        pm.expect.fail(\"回應中無 ran_domain\");",
+							"    });",
 							"}",
+							"",
 							"",
 							"setTimeout(function() {",
 							"    console.log(\"延遲 5 秒後執行下一個 API...\");",
@@ -427,7 +431,7 @@
 		},
 		{
 			"key": "ran_domain",
-			"value": ""
+			"value": "srtest111.com"
 		}
 	]
 }
