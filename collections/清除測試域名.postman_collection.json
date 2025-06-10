@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "399ffbc4-9a0e-48f5-a397-e05e24f37958",
-		"name": "清除測試域名",
+		"name": "15清除測試域名",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42767672"
 	},
@@ -266,6 +266,35 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ran_domain",
+			"value": "srtest111.com",
+			"type": "string"
 		}
 	]
 }
