@@ -559,6 +559,7 @@ pipeline {
                     --environment "${ENV_FILE}" \
                     --export-environment "/tmp/exported_env.json" \
                     --iteration-data "${tmpDataFile}" \
+                    --verbose \
                     --insecure \
                     --reporters cli,json,html,junit,allure \
                     --reporter-json-export "${REPORT_DIR}/Apply_${index + 1}.json" \
@@ -594,6 +595,7 @@ pipeline {
                     newman run "${collectionPath}" \
                       --environment "${ENV_FILE}" \
                       --export-environment "/tmp/exported_env.json" \
+                      --verbose \
                       --insecure \
                       --reporters cli,json,html,junit,allure \
                       --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
