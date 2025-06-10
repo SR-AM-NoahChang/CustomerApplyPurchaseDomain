@@ -210,6 +210,11 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                             },
                                             {
                                                 "textParagraph": {
+                                                    "text": "────────────────────────────"
+                                                }
+                                            },
+                                            {
+                                                "textParagraph": {
                                                     "text": "<b>🛠 有人工 PATCH Job：</b><br>${patchedJobs.join("<br>").replace('"', '\\"')}"
                                                 }
                                             }
