@@ -289,12 +289,5 @@
 				]
 			}
 		}
-	],
-	"variable": [
-		{
-			"key": "ran_domain",
-			"value": "srtest111.com",
-			"type": "string"
-		}
 	]
 }
