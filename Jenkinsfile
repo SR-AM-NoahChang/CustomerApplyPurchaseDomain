@@ -156,7 +156,17 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                         },
                                         {
                                             "textParagraph": {
+                                                "text": "────────────────────────────"
+                                            }
+                                        },
+                                        {
+                                            "textParagraph": {
                                                 "text": "<b>🛠 已 PATCH Job：</b><br>${patchedJobs.isEmpty() ? "（無）" : patchedJobs.join("<br>").replace('"', '\\"')}"
+                                            }
+                                        },
+                                         {
+                                            "textParagraph": {
+                                                "text": "────────────────────────────"
                                             }
                                         },
                                         {
@@ -444,9 +454,19 @@ def DeleteDomainJobStatus() {
                                                 "text": "<b>🔍 初始 Job 狀態：</b><br>${initialJobList.replace('"', '\\"').replaceAll("\\n", "<br>")}"
                                             }
                                         },
+                                         {
+                                            "textParagraph": {
+                                                "text": "────────────────────────────"
+                                            }
+                                        },
                                         {
                                             "textParagraph": {
                                                 "text": "<b>🛠 已 PATCH Job：</b><br>${patchedJobs.isEmpty() ? "（無）" : patchedJobs.join("<br>").replace('"', '\\"')}"
+                                            }
+                                        },
+                                        {
+                                            "textParagraph": {
+                                                "text": "────────────────────────────"
                                             }
                                         },
                                         {
