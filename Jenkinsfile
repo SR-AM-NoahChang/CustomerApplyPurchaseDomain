@@ -681,9 +681,18 @@ pipeline {
                     --reporter-allure-export "${ALLURE_RESULTS_DIR}"
                 """
               }
-              // 讀取 workflow_id 並設定成環境變數
-              if (fileExists("/tmp/exported_env.json")) {
-                def PD_WORKFLOW_ID = readExportedEnvVariable("/tmp/exported_env.json", "PD_WORKFLOW_ID")
+
+              // 更新 ENV_FILE 為每筆資料的最新 exported_env.json
+              def exportedEnvPath = "/tmp/exported_env.json"
+              def currentEnvPath = "${WORKSPACE}/environments/current_env_${index + 1}.json"
+
+              if (fileExists(exportedEnvPath)) {
+                sh "mkdir -p ${WORKSPACE}/environments"
+                sh "cp ${exportedEnvPath} ${currentEnvPath}"
+                env.ENV_FILE = currentEnvPath
+                echo "✅ 更新 ENV_FILE 為最新：${currentEnvPath}"
+
+                def PD_WORKFLOW_ID = readExportedEnvVariable(exportedEnvPath, "PD_WORKFLOW_ID")
                 echo "📤 從 exported_env.json 讀取的 PD_WORKFLOW_ID: ${PD_WORKFLOW_ID}"
                 if (PD_WORKFLOW_ID) {
                   env.PD_WORKFLOW_ID = PD_WORKFLOW_ID
@@ -700,25 +709,30 @@ pipeline {
             }
 
             stage("${testLabel} - 刪除域名") {
-              def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
-              if (fileExists(collectionPath)) {
+            def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
+            def deleteEnvFile = "${WORKSPACE}/environments/current_env_${index + 1}.json"
+
+            if (fileExists(collectionPath)) {
                 echo "🧹 執行清除測試域名 Collection"
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                  sh """
+                sh """
                     newman run "${collectionPath}" \
-                      --environment "${ENV_FILE}" \
-                      --export-environment "/tmp/exported_env.json" \
-                      --verbose \
-                      --insecure \
-                      --reporters cli,json,html,junit,allure \
-                      --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
-                      --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
-                      --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
-                      --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                  """
+                    --environment "${deleteEnvFile}" \
+                    --export-environment "/tmp/exported_env.json" \
+                    --verbose \
+                    --insecure \
+                    --reporters cli,json,html,junit,allure \
+                    --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
+                    --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
+                    --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
+                    --reporter-allure-export "${ALLURE_RESULTS_DIR}"
+                """
                 }
-              }
+            } else {
+                echo "❌ 找不到清除測試域名 collection：${collectionPath}"
+                }
             }
+
 
             stage("${testLabel} - 檢查刪除 Job 狀態") {
               DeleteDomainJobStatus()
@@ -820,3 +834,4 @@ pipeline {
     }
   }
 }
+
