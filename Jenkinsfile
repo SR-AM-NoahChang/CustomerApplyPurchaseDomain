@@ -126,9 +126,12 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     def stillPending = recheckJobs.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
 
                     if (remainingFailures || remainingBlocked) {
-                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌failure" }
-                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒blocked" }
+                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌" }
+                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒" }
                         def allIssues = (failedDetails + blockedDetails).join("\\n")
+
+                        def domains = recheckJobs*.domain.findAll { it }
+                        def uniqueDomains = domains.unique().join(', ')
 
                         def message = """{
                             "cards": [{
@@ -141,7 +144,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                     "widgets": [
                                         {
                                             "textParagraph": {
-                                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${uniqueDomains}</b>"
                                             }
                                         },
                                         {
@@ -194,6 +197,8 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
 
                         // ✅ 新增成功時 webhook 通知
                         if (!patchedJobs.isEmpty()) {
+                            def domains = recheckJobs*.domain.findAll { it }
+                            def uniqueDomains = domains.unique().join(', ')
                             def successPatchedMessage = """{
                                 "cards": [{
                                     "header": {
@@ -205,7 +210,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                         "widgets": [
                                             {
                                                 "textParagraph": {
-                                                    "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                                    "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${uniqueDomains}</b>"
                                             }
                                             },
                                             {
@@ -262,7 +267,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                 "widgets": [
                                     {
                                         "textParagraph": {
-                                            "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                            "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>"
                                         }
                                     },
                                     {
@@ -426,9 +431,12 @@ def DeleteDomainJobStatus() {
                     def stillPending = recheckJobs.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
 
                     if (remainingFailures || remainingBlocked) {
-                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌failure" }
-                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒blocked" }
+                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌" }
+                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒" }
                         def allIssues = (failedDetails + blockedDetails).join("\\n")
+
+                        def domains = recheckJobs*.domain.findAll { it }
+                        def uniqueDomains = domains.unique().join(', ')
 
                         def message = """{
                             "cards": [{
@@ -441,7 +449,7 @@ def DeleteDomainJobStatus() {
                                     "widgets": [
                                         {
                                             "textParagraph": {
-                                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${uniqueDomains}</b>"
                                             }
                                         },
                                         {
@@ -482,7 +490,7 @@ def DeleteDomainJobStatus() {
                         writeFile file: 'payload.json', text: message
 
                         withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
-                            sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
+                             sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
                         }
 
                         error("❌ 異常 Job 偵測後仍存在（已通知 webhook）")
@@ -494,6 +502,8 @@ def DeleteDomainJobStatus() {
 
                         // ✅ 新增成功時 webhook 通知
                         if (!patchedJobs.isEmpty()) {
+                            def domains = recheckJobs*.domain.findAll { it }
+                            def uniqueDomains = domains.unique().join(', ')
                             def successPatchedMessage = """{
                                 "cards": [{
                                     "header": {
@@ -505,7 +515,7 @@ def DeleteDomainJobStatus() {
                                         "widgets": [
                                             {
                                                 "textParagraph": {
-                                                    "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                                    "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${uniqueDomains}</b>"
                                             }
                                             },
                                             {
@@ -538,6 +548,7 @@ def DeleteDomainJobStatus() {
                             withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
                                 sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
                             }
+
                         }
 
                         break
@@ -561,7 +572,7 @@ def DeleteDomainJobStatus() {
                                 "widgets": [
                                     {
                                         "textParagraph": {
-                                            "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow ID: <b>${workflowId}</b>"
+                                            "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>"
                                         }
                                     },
                                     {
@@ -645,7 +656,6 @@ pipeline {
         script {
           def testData = readJSON file: "${COLLECTION_DIR}/申請廳主買域名_testdata.json"
 
-          // 定義函式：讀取 exported_env.json 裡指定的 key 值
           def readExportedEnvVariable = { filePath, key ->
             def envData = readJSON file: filePath
             def value = null
@@ -662,7 +672,6 @@ pipeline {
           testData.eachWithIndex { dataRow, index ->
             def testLabel = "資料${index + 1}"
             def tmpDataFile = "${WORKSPACE}/data_${index + 1}.json"
-
             writeJSON file: tmpDataFile, json: [dataRow]
 
             stage("${testLabel} - 申請域名") {
@@ -682,7 +691,6 @@ pipeline {
                 """
               }
 
-              // 更新 ENV_FILE 為每筆資料的最新 exported_env.json
               def exportedEnvPath = "/tmp/exported_env.json"
               def currentEnvPath = "${WORKSPACE}/environments/current_env_${index + 1}.json"
 
@@ -709,30 +717,29 @@ pipeline {
             }
 
             stage("${testLabel} - 刪除域名") {
-            def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
-            def deleteEnvFile = "${WORKSPACE}/environments/current_env_${index + 1}.json"
+              def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
+              def deleteEnvFile = "${WORKSPACE}/environments/current_env_${index + 1}.json"
 
-            if (fileExists(collectionPath)) {
+              if (fileExists(collectionPath)) {
                 echo "🧹 執行清除測試域名 Collection"
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                sh """
+                  sh """
                     newman run "${collectionPath}" \
-                    --environment "${deleteEnvFile}" \
-                    --export-environment "/tmp/exported_env.json" \
-                    --verbose \
-                    --insecure \
-                    --reporters cli,json,html,junit,allure \
-                    --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
-                    --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
-                    --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
-                    --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                """
+                      --environment "${deleteEnvFile}" \
+                      --export-environment "/tmp/exported_env.json" \
+                      --verbose \
+                      --insecure \
+                      --reporters cli,json,html,junit,allure \
+                      --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
+                      --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
+                      --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
+                      --reporter-allure-export "${ALLURE_RESULTS_DIR}"
+                  """
                 }
-            } else {
+              } else {
                 echo "❌ 找不到清除測試域名 collection：${collectionPath}"
-                }
+              }
             }
-
 
             stage("${testLabel} - 檢查刪除 Job 狀態") {
               DeleteDomainJobStatus()
@@ -746,7 +753,7 @@ pipeline {
       steps {
         script {
           def files = sh(script: "ls ${HTML_REPORT_DIR}", returnStdout: true).trim().split('\n')
-          def indexHtml = new File("${HTML_REPORT_DIR}/01_report.html")
+          def indexHtml = new File("${HTML_REPORT_DIR}/CustomerApplyPurchaseDomain_report.html")
           indexHtml.text = "<html><body><h1>測試報告列表</h1><ul>\n"
           files.each { file ->
             if (file.endsWith('.html')) {
@@ -763,16 +770,6 @@ pipeline {
           allowMissing: true,
           alwaysLinkToLastBuild: true,
           keepAll: true
-        ])
-      }
-    }
-
-    stage('Allure Report') {
-      steps {
-        allure([
-          includeProperties: false,
-          jdk: '',
-          results: [[path: "${ALLURE_RESULTS_DIR}"]]
         ])
       }
     }
@@ -830,8 +827,16 @@ pipeline {
         withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
           sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
         }
+
+        echo "📦 產生 Allure 測試報告..."
+        allure([
+          includeProperties: false,
+          jdk: '',
+          results: [[path: "${ALLURE_RESULTS_DIR}"]]
+        ])
       }
     }
   }
 }
+
 
