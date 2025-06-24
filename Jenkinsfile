@@ -126,8 +126,17 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     def stillPending = recheckJobs.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
 
                     if (remainingFailures || remainingBlocked) {
-                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌" }
-                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒" }
+                        def failedDetails = remainingFailures.collect {
+                            def jobName = jobNameMap.get(it.name, it.name)
+                            def msg = it.message?.trim()
+                            "- ${jobName}${msg ? "（${msg}）" : ""} - ❌"
+                        }
+                        def blockedDetails = remainingBlocked.collect {
+                            def jobName = jobNameMap.get(it.name, it.name)
+                            def msg = it.message?.trim()
+                            "- ${jobName}${msg ? "（${msg}）" : ""} - 🔒"
+                        }
+
                         def allIssues = (failedDetails + blockedDetails).join("\\n")
 
                         def domains = recheckJobs*.domain.findAll { it }
@@ -431,8 +440,17 @@ def DeleteDomainJobStatus() {
                     def stillPending = recheckJobs.findAll { !(it.status in ['success', 'running', 'failure', 'blocked']) }
 
                     if (remainingFailures || remainingBlocked) {
-                        def failedDetails = remainingFailures.collect { "- ${jobNameMap.get(it.name, it.name)} - ❌" }
-                        def blockedDetails = remainingBlocked.collect { "- ${jobNameMap.get(it.name, it.name)} - 🔒" }
+                        def failedDetails = remainingFailures.collect {
+                            def jobName = jobNameMap.get(it.name, it.name)
+                            def msg = it.message?.trim()
+                            "- ${jobName}${msg ? "（${msg}）" : ""} - ❌"
+                        }
+                        def blockedDetails = remainingBlocked.collect {
+                            def jobName = jobNameMap.get(it.name, it.name)
+                            def msg = it.message?.trim()
+                            "- ${jobName}${msg ? "（${msg}）" : ""} - 🔒"
+                        }
+
                         def allIssues = (failedDetails + blockedDetails).join("\\n")
 
                         def domains = recheckJobs*.domain.findAll { it }
