@@ -73,12 +73,12 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
 
                     def response = sh(
-                        script: """
+                        script: '''
                             curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
                                 -H "X-API-Key: ${ADM_KEY}" \\
                                 -H "Accept: application/json" \\
                                 -H "Content-Type: application/json"
-                        """,
+                        ''',
                         returnStdout: true
                     ).trim()
 
@@ -97,13 +97,13 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     for (job in failedJobs) {
                         echo "🛠 人工調整 Job ID: ${job.job_id} (${job.name}) 為 success"
                         def patchResponse = sh(
-                            script: """
+                            script: '''
                                 curl -s -X PATCH '${BASE_URL}/workflow_api/adm/jobs/status' \\
                                     -H 'Accept: application/json' \\
                                     -H 'X-API-Key: ${ADM_KEY}' \\
                                     -H 'Content-Type: application/json' \\
                                     -d '{"id":${job.job_id},"status":"success"}'
-                            """,
+                            ''',
                             returnStdout: true
                         ).trim()
                         echo "📬 PATCH 回應：${patchResponse}"
@@ -111,12 +111,12 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                     }
 
                     def recheckResponse = sh(
-                        script: """
+                        script: '''
                             curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
                                 -H "X-API-Key: ${ADM_KEY}" \\
                                 -H "Accept: application/json" \\
                                 -H "Content-Type: application/json"
-                        """,
+                        ''',
                         returnStdout: true
                     ).trim()
 
@@ -142,7 +142,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                         def domains = recheckJobs*.domain.findAll { it }
                         def uniqueDomains = domains.unique().join(', ')
 
-                        def message = """{
+                        def message = '''{
                             "cards": [{
                                 "header": {
                                     "title": "🚨 廳主買域名項目資料 (Job狀態檢查 - 異常)",
@@ -189,7 +189,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                     ]
                                 }]
                             }]
-                        }"""
+                        }'''
 
                         writeFile file: 'payload.json', text: message
 
@@ -208,7 +208,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                         if (!patchedJobs.isEmpty()) {
                             def domains = recheckJobs*.domain.findAll { it }
                             def uniqueDomains = domains.unique().join(', ')
-                            def successPatchedMessage = """{
+                            def successPatchedMessage = '''{
                                 "cards": [{
                                     "header": {
                                         "title": "✅ 廳主買域名項目資料 (Job狀態檢查) 成功",
@@ -245,7 +245,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                         ]
                                     }]
                                 }]
-                            }"""
+                            }'''
 
                             writeFile file: 'payload.json', text: successPatchedMessage
 
@@ -265,7 +265,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                 if (!success) {
                     echo "⏰ 超過最大重試次數（${maxRetries} 次），workflow 未完成"
 
-                    def timeoutMessage = """{
+                    def timeoutMessage = '''{
                         "cards": [{
                             "header": {
                                 "title": "⏰ 廳主買域名項目資料 (Job狀態檢查) 輪詢超時失敗",
@@ -297,7 +297,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                                 ]
                             }]
                         }]
-                    }"""
+                    }'''
 
                     writeFile file: 'payload.json', text: timeoutMessage
 
@@ -387,12 +387,12 @@ def DeleteDomainJobStatus() {
                     echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
 
                     def response = sh(
-                        script: """
+                        script: '''
                             curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
                                 -H "X-API-Key: ${ADM_KEY}" \\
                                 -H "Accept: application/json" \\
                                 -H "Content-Type: application/json"
-                        """,
+                        ''',
                         returnStdout: true
                     ).trim()
 
@@ -411,13 +411,13 @@ def DeleteDomainJobStatus() {
                     for (job in failedJobs) {
                         echo "🛠 人工調整 Job ID: ${job.job_id} (${job.name}) 為 success"
                         def patchResponse = sh(
-                            script: """
+                            script: '''
                                 curl -s -X PATCH '${BASE_URL}/workflow_api/adm/jobs/status' \\
                                     -H 'Accept: application/json' \\
                                     -H 'X-API-Key: ${ADM_KEY}' \\
                                     -H 'Content-Type: application/json' \\
                                     -d '{"id":${job.job_id},"status":"success"}'
-                            """,
+                            ''',
                             returnStdout: true
                         ).trim()
                         echo "📬 PATCH 回應：${patchResponse}"
@@ -425,12 +425,12 @@ def DeleteDomainJobStatus() {
                     }
 
                     def recheckResponse = sh(
-                        script: """
+                        script: '''
                             curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
                                 -H "X-API-Key: ${ADM_KEY}" \\
                                 -H "Accept: application/json" \\
                                 -H "Content-Type: application/json"
-                        """,
+                        ''',
                         returnStdout: true
                     ).trim()
 
@@ -456,7 +456,7 @@ def DeleteDomainJobStatus() {
                         def domains = recheckJobs*.domain.findAll { it }
                         def uniqueDomains = domains.unique().join(', ')
 
-                        def message = """{
+                        def message = '''{
                             "cards": [{
                                 "header": {
                                     "title": "🚨 刪除域名項目資料 (Job狀態檢查 - 異常)",
@@ -503,7 +503,7 @@ def DeleteDomainJobStatus() {
                                     ]
                                 }]
                             }]
-                        }"""
+                        }'''
 
                         writeFile file: 'payload.json', text: message
 
@@ -522,7 +522,7 @@ def DeleteDomainJobStatus() {
                         if (!patchedJobs.isEmpty()) {
                             def domains = recheckJobs*.domain.findAll { it }
                             def uniqueDomains = domains.unique().join(', ')
-                            def successPatchedMessage = """{
+                            def successPatchedMessage = '''{
                                 "cards": [{
                                     "header": {
                                         "title": "✅ 刪除域名項目資料 (Job狀態檢查) 成功",
@@ -559,7 +559,7 @@ def DeleteDomainJobStatus() {
                                         ]
                                     }]
                                 }]
-                            }"""
+                            }'''
 
                             writeFile file: 'payload.json', text: successPatchedMessage
 
@@ -579,7 +579,7 @@ def DeleteDomainJobStatus() {
             if (!success) {
                     echo "⏰ 超過最大重試次數（${maxRetries} 次），workflow 未完成"
 
-                    def timeoutMessage = """{
+                    def timeoutMessage = '''{
                         "cards": [{
                             "header": {
                                 "title": "⏰ 刪除域名項目資料 (Job狀態檢查) 輪詢超時失敗",
@@ -611,7 +611,7 @@ def DeleteDomainJobStatus() {
                                 ]
                             }]
                         }]
-                    }"""
+                    }'''
 
                     writeFile file: 'payload.json', text: timeoutMessage
 
@@ -694,7 +694,7 @@ pipeline {
 
             stage("${testLabel} - 申請域名") {
               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                sh """
+                sh '''
                   newman run '${COLLECTION_DIR}/申請廳主買域名.postman_collection.json' \
                     --environment "${ENV_FILE}" \
                     --export-environment "/tmp/exported_env.json" \
@@ -706,7 +706,7 @@ pipeline {
                     --reporter-html-export "${HTML_REPORT_DIR}/Apply_${index + 1}.html" \
                     --reporter-junit-export "${REPORT_DIR}/Apply_${index + 1}.xml" \
                     --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                """
+                '''
               }
 
               def exportedEnvPath = "/tmp/exported_env.json"
@@ -741,7 +741,7 @@ pipeline {
               if (fileExists(collectionPath)) {
                 echo "🧹 執行清除測試域名 Collection"
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                  sh """
+                  sh '''
                     newman run "${collectionPath}" \
                       --environment "${deleteEnvFile}" \
                       --export-environment "/tmp/exported_env.json" \
@@ -752,7 +752,7 @@ pipeline {
                       --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
                       --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
                       --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                  """
+                  '''
                 }
               } else {
                 echo "❌ 找不到清除測試域名 collection：${collectionPath}"
@@ -809,7 +809,7 @@ pipeline {
 
         def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
 
-        def message = """
+        def message = '''
         {
           \"cards\": [
             {
@@ -840,7 +840,7 @@ pipeline {
             }
           ]
         }
-        """
+        '''
         writeFile file: 'payload.json', text: message
         withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
           sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
