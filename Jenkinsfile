@@ -626,7 +626,6 @@ def DeleteDomainJobStatus() {
     }
 }
 
-
 pipeline {
   agent any
 
@@ -662,10 +661,7 @@ pipeline {
 
     stage('Show Commit Info') {
       steps {
-        sh '''
-          echo "✅ 當前 Git commit：$(git rev-parse HEAD)"
-          echo "📝 Commit 訊息：$(git log -1 --oneline)"
-        '''
+        sh 'bash -c "echo \"✅ 當前 Git commit：\$(git rev-parse HEAD)\"; echo \"📝 Commit 訊息：\$(git log -1 --oneline)\""'
       }
     }
 
@@ -694,8 +690,9 @@ pipeline {
 
             stage("${testLabel} - 申請域名") {
               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                sh '''
-                  newman run '${COLLECTION_DIR}/申請廳主買域名.postman_collection.json' \
+                sh """
+                bash -c '
+                  newman run "${COLLECTION_DIR}/申請廳主買域名.postman_collection.json" \
                     --environment "${ENV_FILE}" \
                     --export-environment "/tmp/exported_env.json" \
                     --iteration-data "${tmpDataFile}" \
@@ -706,15 +703,15 @@ pipeline {
                     --reporter-html-export "${HTML_REPORT_DIR}/Apply_${index + 1}.html" \
                     --reporter-junit-export "${REPORT_DIR}/Apply_${index + 1}.xml" \
                     --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                '''
+                '
+                """
               }
 
               def exportedEnvPath = "/tmp/exported_env.json"
               def currentEnvPath = "${WORKSPACE}/environments/current_env_${index + 1}.json"
 
               if (fileExists(exportedEnvPath)) {
-                sh "mkdir -p ${WORKSPACE}/environments"
-                sh "cp ${exportedEnvPath} ${currentEnvPath}"
+                sh "bash -c 'mkdir -p ${WORKSPACE}/environments && cp ${exportedEnvPath} ${currentEnvPath}'"
                 env.ENV_FILE = currentEnvPath
                 echo "✅ 更新 ENV_FILE 為最新：${currentEnvPath}" 
 
@@ -741,7 +738,8 @@ pipeline {
               if (fileExists(collectionPath)) {
                 echo "🧹 執行清除測試域名 Collection"
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                  sh '''
+                  sh """
+                  bash -c '
                     newman run "${collectionPath}" \
                       --environment "${deleteEnvFile}" \
                       --export-environment "/tmp/exported_env.json" \
@@ -752,7 +750,8 @@ pipeline {
                       --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
                       --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
                       --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                  '''
+                  '
+                  """
                 }
               } else {
                 echo "❌ 找不到清除測試域名 collection：${collectionPath}"
@@ -809,7 +808,7 @@ pipeline {
 
         def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
 
-        def message = '''
+        def message = """
         {
           \"cards\": [
             {
@@ -840,7 +839,8 @@ pipeline {
             }
           ]
         }
-        '''
+        """
+
         writeFile file: 'payload.json', text: message
         withEnv(["WEBHOOK=${WEBHOOK_URL}"]) {
           sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
