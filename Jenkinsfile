@@ -441,7 +441,7 @@ def DeleteDomainJobStatus() {
 
                     if (remainingFailures || remainingBlocked) {
                         def failedDetails = remainingFailures.collect {
-                            def jobName = jobNameMap.get(it.name, it.name)
+                            def jobName = jobNameMap.get(it.name, it.name) 
                             def msg = it.message?.trim()
                             "- ${jobName}${msg ? "（${msg}）" : ""} - ❌"
                         }
@@ -511,7 +511,7 @@ def DeleteDomainJobStatus() {
                              sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
                         }
 
-                        error("❌ 異常 Job 偵測後仍存在（已通知 webhook）")
+                        error("❌ 異常 Job 偵測後仍存在（已通知 webhook）") 
                     }
 
                     if (stillPending.isEmpty()) {
@@ -642,7 +642,7 @@ pipeline {
     ENV_FILE = "${env.WORKSPACE}/environments/DEV.postman_environment.json"
     WEBHOOK_URL = credentials('GOOGLE_CHAT_WEBHOOK')
     BASE_URL = "http://maid-cloud.vir999.com"
-    ADM_KEY = credentials('DEV_ADM_KEY')
+    ADM_KEY = credentials('DEV_ADM_KEY') 
   }
 
   stages {
@@ -716,7 +716,7 @@ pipeline {
                 sh "mkdir -p ${WORKSPACE}/environments"
                 sh "cp ${exportedEnvPath} ${currentEnvPath}"
                 env.ENV_FILE = currentEnvPath
-                echo "✅ 更新 ENV_FILE 為最新：${currentEnvPath}"
+                echo "✅ 更新 ENV_FILE 為最新：${currentEnvPath}" 
 
                 def PD_WORKFLOW_ID = readExportedEnvVariable(exportedEnvPath, "PD_WORKFLOW_ID")
                 echo "📤 從 exported_env.json 讀取的 PD_WORKFLOW_ID: ${PD_WORKFLOW_ID}"
