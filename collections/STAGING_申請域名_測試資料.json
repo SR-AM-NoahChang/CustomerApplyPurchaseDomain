@@ -1,0 +1,8 @@
+[
+  {"domain": "srtest666.com", "web_layout": "normal", "apply_certificate": false, "apply_third_level_random": false, "verify_mode": "TXT", "txt": "dct", "company_maintenance": "true", "domain_provider": "dctest", "provider_account": "abc123", "provider_password": "abc123456"},
+  {"domain": "srtest999.info", "web_layout": "normal", "apply_certificate": false, "apply_third_level_random": false, "verify_mode": "name server", "txt": "", "company_maintenance": "true", "domain_provider": "dctest", "provider_account": "abc123", "provider_password": "abc123456"},
+  {"domain": "srtest018.com", "web_layout": "normal", "apply_certificate": true, "apply_third_level_random": false, "verify_mode": "name server", "txt": "", "company_maintenance": "true", "domain_provider": "dctest", "provider_account": "abc123", "provider_password": "abc123456"},
+  {"domain": "srtest019.com", "web_layout": "normal", "apply_certificate": true, "apply_third_level_random": true, "verify_mode": "name server", "txt": "", "company_maintenance": "true", "domain_provider": "dctest", "provider_account": "abc123", "provider_password": "abc123456"},
+  {"domain": "bbin0123.com", "web_layout": "normal", "apply_certificate": false, "apply_third_level_random": false, "verify_mode": "name server", "txt": "", "company_maintenance": "true", "domain_provider": "dctest", "provider_account": "abc123", "provider_password": "abc123456"}
+ 
+]
