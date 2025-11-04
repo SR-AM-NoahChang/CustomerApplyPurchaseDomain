@@ -638,10 +638,10 @@ pipeline {
     REPORT_DIR = "${env.WORKSPACE}/reports"
     HTML_REPORT_DIR = "${env.WORKSPACE}/reports/html"
     ALLURE_RESULTS_DIR = "${env.WORKSPACE}/allure-results"
-    ENV_FILE = "${env.WORKSPACE}/environments/DEV.postman_environment.json"
+    ENV_FILE = "${env.WORKSPACE}/environments/STAGING.postman_environment.json"
     WEBHOOK_URL = credentials('GOOGLE_CHAT_WEBHOOK')
-    BASE_URL = "http://maid-cloud.vir999.com"
-    ADM_KEY = credentials('DEV_ADM_KEY') 
+    BASE_URL = "http://maid-cloud.staging168.com"
+    ADM_KEY = credentials('STAGING_ADM_KEY') 
   }
 
   stages {
@@ -668,7 +668,7 @@ pipeline {
     stage('申請廳主買域名') {
       steps {
         script {
-          def testData = readJSON file: "${COLLECTION_DIR}/申請廳主買域名_testdata.json"
+          def testData = readJSON file: "${COLLECTION_DIR}/STAGING_申請域名_測試資料.json"
 
           def readExportedEnvVariable = { filePath, key ->
             def envData = readJSON file: filePath
@@ -729,37 +729,6 @@ pipeline {
 
             stage("${testLabel} - 檢查申請 Job 狀態") {
               checkCustomerApplyPurchaseDomainJobStatus()
-            }
-
-            stage("${testLabel} - 刪除域名") {
-              def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
-              def deleteEnvFile = "${WORKSPACE}/environments/current_env_${index + 1}.json"
-
-              if (fileExists(collectionPath)) {
-                echo "🧹 執行清除測試域名 Collection"
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                  sh """
-                  bash -c '
-                    newman run "${collectionPath}" \
-                      --environment "${deleteEnvFile}" \
-                      --export-environment "/tmp/exported_env.json" \
-                      --verbose \
-                      --insecure \
-                      --reporters cli,json,html,junit,allure \
-                      --reporter-json-export "${REPORT_DIR}/Delete_${index + 1}.json" \
-                      --reporter-html-export "${HTML_REPORT_DIR}/Delete_${index + 1}.html" \
-                      --reporter-junit-export "${REPORT_DIR}/Delete_${index + 1}.xml" \
-                      --reporter-allure-export "${ALLURE_RESULTS_DIR}"
-                  '
-                  """
-                }
-              } else {
-                echo "❌ 找不到清除測試域名 collection：${collectionPath}"
-              }
-            }
-
-            stage("${testLabel} - 檢查刪除 Job 狀態") {
-              DeleteDomainJobStatus()
             }
           }
         }
