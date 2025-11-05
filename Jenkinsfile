@@ -214,18 +214,18 @@ def DeleteDomainJobStatus() {
         def patchedJobs = []
 
         while (retryCount < maxRetries) {
-                    def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
-                    echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
+                def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
+                echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
 
-                    def response = sh(
-                        script: '''
-                            curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
-                                -H "X-API-Key: ${ADM_KEY}" \\
-                                -H "Accept: application/json" \\
-                                -H "Content-Type: application/json"
-                        ''',
-                        returnStdout: true
-                    ).trim()
+                def response = sh(
+                    script: """
+                        curl -s -X GET "${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs" \\
+                            -H "X-API-Key: ${ADM_KEY}" \\
+                            -H "Accept: application/json" \\
+                            -H "Content-Type: application/json"
+                    """,
+                    returnStdout: true
+                ).trim()
 
                     def json = readJSON text: response
 
