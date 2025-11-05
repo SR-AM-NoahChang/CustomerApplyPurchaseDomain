@@ -556,30 +556,6 @@ pipeline {
             }
         }
 
-        stage('Publish HTML Reports') {
-            steps {
-                script {
-                    def files = sh(script: "ls ${HTML_REPORT_DIR}", returnStdout: true).trim().split('\n')
-                    def indexHtml = new File("${HTML_REPORT_DIR}/CustomerApplyPurchaseDomain_report.html")
-                    indexHtml.text = "<html><body><h1>測試報告列表</h1><ul>\n"
-                    files.each { file ->
-                        if (file.endsWith('.html')) {
-                            indexHtml << "<li><a href='${file}'>${file}</a></li>\n"
-                        }
-                    }
-                    indexHtml << "</ul></body></html>\n"
-                }
-
-                publishHTML(target: [
-                    reportDir: "${HTML_REPORT_DIR}",
-                    reportFiles: 'CustomerApplyPurchaseDomain_report.html',
-                    reportName: '整合 HTML 測試報告',
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true
-                ])
-            }
-        }
     }
 
     post {
