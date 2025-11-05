@@ -122,7 +122,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
             {
                 "cards": [{
                     "header": {
-                        "title": "ℹ️ 廳主買域名項目資料 (Job狀態檢查)",
+                        "title": "ℹ️申請廳主買域名 (Job狀態檢查)",
                         "subtitle": "Workflow 輪詢完成",
                         "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                     },
