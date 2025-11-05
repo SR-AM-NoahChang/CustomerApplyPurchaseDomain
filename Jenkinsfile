@@ -66,10 +66,10 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
         def delaySeconds = 300
         def retryCount = 0
         def success = false
-        def initialJobList = []
-        def lastJobs = []
+        def finalJobList = []
+        def domains = []
 
-        withCredentials([string(credentialsId: 'STAGING_ADM_KEY', variable: 'ADM_KEY')]) {
+        withEnv(["ADM_KEY=${ADM_KEY}"]) {
             while (retryCount < maxRetries) {
                 def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
                 echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
@@ -85,18 +85,25 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
                 ).trim()
 
                 def jobs = readJSON text: response
-                lastJobs = jobs
+                domains = jobs*.domain.findAll { it }?.unique() ?: []
 
-                if (retryCount == 0) {
-                    initialJobList = jobs.collect {
-                        "- ${jobNameMap.get(it.name, it.name)} - ${it.status}"
-                    }
+                // 更新最終 Job 狀態
+                finalJobList = jobs.collect {
+                    "- ${jobNameMap.get(it.name, it.name)}：${it.status}"
                 }
 
-                def stillPending = jobs.findAll { !(it.status in ['success', 'running']) }
+                // 若有 failure 或 blocked，立即停止輪詢
+                def hasFailureOrBlocked = jobs.any { it.status in ['failure', 'blocked'] }
+                if (hasFailureOrBlocked) {
+                    echo "❌ 發現 Job failure 或 blocked，停止輪詢"
+                    success = false
+                    break
+                }
 
+                // 若所有 Job 都完成
+                def stillPending = jobs.findAll { !(it.status in ['success', 'running']) }
                 if (stillPending.isEmpty()) {
-                    echo "✅ 所有 Job 已完成，提前結束輪詢"
+                    echo "✅ 所有 Job 已完成"
                     success = true
                     break
                 }
@@ -107,24 +114,22 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
             }
 
             if (!success) {
-                echo "⏰ 超過最大重試次數（${maxRetries} 次），workflow 可能未完成，但 pipeline 將視為 SUCCESS"
+                echo "⏰ 超過最大重試次數或 Job 失敗/封鎖，workflow 未完成，視為失敗"
             }
 
-            // 使用安全 collect 方式取得 domains
-            def domains = lastJobs?.collect { it.domain }?.findAll { it }?.unique()?.join(', ')
-
+            // 發送 Webhook（顯示最終狀態）
             def message = """
             {
                 "cards": [{
                     "header": {
-                        "title": "ℹ️ 廳主買域名項目資料 (Job狀態檢查)",
+                        "title": "ℹ️申請廳主買域名 (Job狀態檢查)",
                         "subtitle": "Workflow 輪詢完成",
                         "imageUrl": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/postman-icon.png"
                     },
                     "sections": [{
                         "widgets": [{
                             "textParagraph": {
-                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${domains}</b>\\n🔍 初始 Job 狀態：<br>${initialJobList.join('<br>').replace('"','\\"')}"
+                                "text": "🌐 環境: <b>${envName}</b>\\n🔗 BASE_URL: ${BASE_URL}\\n🆔 Workflow_Id: <b>${workflowId}</b>\\n🏷️ Domain: <b>${domains.join(', ')}</b>\\n-----------------------------------\\n Job 狀態：<br>${finalJobList.join('<br>').replace('\"','\\\\\"')}"
                             }
                         }]
                     }]
@@ -132,7 +137,7 @@ def checkCustomerApplyPurchaseDomainJobStatus() {
             }
             """
             writeFile file: 'payload.json', text: message
-            sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK_URL"'
+            sh 'curl -k -X POST -H "Content-Type: application/json" -d @payload.json "${WEBHOOK_URL}"'
         }
     }
 }
@@ -209,18 +214,18 @@ def DeleteDomainJobStatus() {
         def patchedJobs = []
 
         while (retryCount < maxRetries) {
-                    def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
-                    echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
+                def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('Asia/Taipei'))
+                echo "🔄 第 ${retryCount + 1} 次輪詢 workflow 狀態（${timestamp}）..."
 
-                    def response = sh(
-                        script: '''
-                            curl -s -X GET '${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs' \\
-                                -H "X-API-Key: ${ADM_KEY}" \\
-                                -H "Accept: application/json" \\
-                                -H "Content-Type: application/json"
-                        ''',
-                        returnStdout: true
-                    ).trim()
+                def response = sh(
+                    script: """
+                        curl -s -X GET "${BASE_URL}/workflow_api/adm/workflows/${workflowId}/jobs" \\
+                            -H "X-API-Key: ${ADM_KEY}" \\
+                            -H "Accept: application/json" \\
+                            -H "Content-Type: application/json"
+                    """,
+                    returnStdout: true
+                ).trim()
 
                     def json = readJSON text: response
 
